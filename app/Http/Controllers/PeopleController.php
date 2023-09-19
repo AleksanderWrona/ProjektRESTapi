@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\People;
 use App\Http\Requests\StorePeopleRequest;
 use App\Http\Requests\UpdatePeopleRequest;
-Use Illuminate\Http\JsonResponse;
+use Illuminate\Http\JsonResponse;
 
 class PeopleController extends Controller
 {
@@ -24,7 +24,12 @@ class PeopleController extends Controller
     {
         $validatedData = $request->validated();
         $people = People::create($validatedData);
-        return response()->json(['id' => $people->id], 201);
+
+        if ($people) {
+            return response()->json(['id' => $people->id], 201);
+        } else {
+            return response()->noContent(500);
+        }
     }
 
     /**
@@ -43,7 +48,13 @@ class PeopleController extends Controller
     {
         $id = $request->route('id');
         $validatedData = $request->validated();
-        People::where('id', $id)->update($validatedData);
+        $result = People::where('id', $id)->update($validatedData);
+
+        if ($result) {
+            return response()->noContent(204);
+        } else {
+            return response()->noContent(500);
+        }
     }
 
     /**
@@ -54,6 +65,6 @@ class PeopleController extends Controller
         $person = People::findOrFail($id);
         $person->delete();
         
-        return response()->noContent(200);
+        return response()->noContent(204);
     }
 }
